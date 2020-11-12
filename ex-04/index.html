@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Example 04 Vuejs hangman</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1>Vuejs hangman!</h1>
+      <h1>{{correctLetters}}</h1>
+
+      <div id="hangman">
+        <div id="upper-body">
+          <span v-show="mistakes >= 1">\</span>
+          <span v-show="mistakes >= 2">O</span>
+          <span v-show="mistakes >= 3">/</span>
+        </div>
+        <div id="middle-body">
+          <span v-show="mistakes >= 4">||</span>
+        </div>
+        <div id="lower-body">
+          <span v-show="mistakes >= 5">/</span>
+          <span v-show="mistakes >= 6">\</span>
+        </div>
+      </div>
+
+      <ul id="letter-panel">
+        <li v-for="(letter, index) in alphabet" :key="index">
+          <button
+            v-on:click="selectLetter(letter)"
+            :disabled="isLetterUsed(letter)"
+          >
+            {{letter.toUpperCase()}}
+          </button>
+        </li>
+      </ul>
+
+      <div id="modal" :class="{ showModal: showModal }">
+        <h2 id="won" v-show="winCondition">YOU WON! :)</h2>
+        <h2 id="lost" v-show="mistakes >= 7">YOU LOST! :(</h2>
+
+        <button onclick="window.location.reload()">Another game?</button>
+      </div>
+    </div>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    var app = new Vue({
+      el: "#app",
+      data: {
+        wordList: [
+          "development",
+          "javascript",
+          "servlet",
+          "technology",
+          "tomcat",
+          "internet",
+        ],
+        word: Math.floor(Math.random() * 5),
+        mistakes: 0,
+        alphabet: "abcdefghijklmnopqrstuvxyz",
+        usedLetters: [],
+        winCondition: false,
+      },
+      computed: {
+        correctLetters() {
+          return this.wordList[this.word]
+            .split("")
+            .map((letter) => {
+              if (this.usedLetters.includes(letter)) return letter;
+              else return "_";
+            })
+            .join(" ");
+        },
+        showModal() {
+          return this.winCondition || this.mistakes >= 7 ? true : false;
+        },
+      },
+      methods: {
+        selectLetter(letter) {
+          if (!this.wordList[this.word].includes(letter)) this.mistakes++;
+          this.usedLetters.push(letter);
+          this.winCondition = this.isWinConditionMet();
+        },
+        isLetterUsed(letter) {
+          return this.usedLetters.includes(letter) ? true : false;
+        },
+        isWinConditionMet() {
+          if (this.correctLetters.replace("_", "").length === 0) return false;
+          else if (
+            this.correctLetters.replace(/ /g, "") == this.wordList[this.word]
+          )
+            return true;
+          else return false;
+        },
+      },
+    });
+  </script>
+  <style>
+    #lost {
+      color: red;
+    }
+
+    #won {
+      color: green;
+    }
+
+    #letter-panel {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.6em;
+      list-style: none;
+    }
+
+    #hangman {
+      height: 64px;
+    }
+
+    #middle-body {
+      margin-left: 14px;
+    }
+
+    #lower-body {
+      margin-left: 9px;
+    }
+
+    #app {
+      display: grid;
+    }
+
+    h1,
+    #hangman {
+      justify-self: center;
+    }
+
+    #modal {
+      display: none;
+    }
+
+    .showModal {
+      display: grid !important;
+      position: fixed;
+      z-index: 1;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0, 0, 0, 0.4);
+      justify-content: center;
+      align-content: center;
+    }
+  </style>
+</html>

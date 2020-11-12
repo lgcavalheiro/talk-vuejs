@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Example 03 - class binding</title>
+  </head>
+  <body>
+    <div id="app">
+      <div v-for="(fruit, index) in fruits" :key="index">
+        <label :for="index">{{fruit.name}}</label>
+        <input
+          type="checkbox"
+          name="fruits"
+          :id="index"
+          :value="fruit"
+          v-model="selectedFruits"
+        />
+      </div>
+      <br />
+      You selected:
+      <ul v-for="(name, index) in selectedFruitNames" :key="name + index">
+        <li>{{name}}</li>
+      </ul>
+      <p :class="{ expensive: isExpensive() }">
+        Total: {{totalPrice}}
+        <span v-show="isExpensive()">Too expensive!</span>
+      </p>
+      <p>Budget: {{budget}}</p>
+    </div>
+  </body>
+  <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+  <script>
+    var app = new Vue({
+      el: "#app",
+      data: {
+        budget: 6.95,
+        fruits: [
+          { name: "Avocado", price: 5.99 },
+          { name: "Apple", price: 1.29 },
+          { name: "Mango", price: 3.2 },
+        ],
+        selectedFruits: [],
+      },
+      computed: {
+        totalPrice() {
+          if (this.selectedFruits.length <= 0) return 0;
+          else
+            return this.selectedFruits
+              .map((fruit) => fruit.price)
+              .reduce((curr, next) => curr + next)
+              .toFixed(2);
+        },
+        selectedFruitNames() {
+          if (this.selectedFruits.length <= 0) return 0;
+          else return this.selectedFruits.map((fruit) => fruit.name);
+        },
+      },
+      methods: {
+        isExpensive() {
+          return this.totalPrice > this.budget;
+        },
+      },
+    });
+  </script>
+  <style>
+    .expensive {
+      color: red;
+    }
+  </style>
+</html>
